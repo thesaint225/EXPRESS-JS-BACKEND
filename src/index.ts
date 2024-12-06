@@ -1,6 +1,7 @@
 import express, { Express } from "express";
 import bootcampRoutes from "./routes/bootcampRoutes";
 import * as dotenv from "dotenv";
+import morgan from "morgan";
 
 // Load the custom config file (config.env)
 const result = dotenv.config({ path: "./config/config.env" });
@@ -11,6 +12,10 @@ if (result.error) {
 // Create an instance of an Express application
 const app: Express = express();
 
+// Dev logging middleware
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
 // Use the imported routes
 app.use("/api/v1/bootcamps", bootcampRoutes); // <-- Fix route prefix
 
