@@ -2,12 +2,18 @@ import express, { Express } from "express";
 import bootcampRoutes from "./routes/bootcampRoutes";
 import * as dotenv from "dotenv";
 import morgan from "morgan";
+import connectDB from "../config/db";
 
 // Load the custom config file (config.env)
 const result = dotenv.config({ path: "./config/config.env" });
 if (result.error) {
   console.log("Error loading .env file", result.error);
 }
+
+console.log(result);
+
+console.log("Mongo URI", process.env.MONGO_URI);
+connectDB();
 
 // Create an instance of an Express application
 const app: Express = express();
