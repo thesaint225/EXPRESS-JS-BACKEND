@@ -4,6 +4,7 @@ import * as dotenv from "dotenv";
 import morgan from "morgan";
 import connectDB from "../config/db";
 import color from "colors";
+import errorHandler from "./middleware/error";
 
 // Load the custom config file (config.env)
 const result = dotenv.config({ path: "./config/config.env" });
@@ -27,8 +28,10 @@ app.use(express.json());
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
-// Use the imported routes
+// Mount router
 app.use("/api/v1/bootcamps", bootcampRoutes); // <-- Fix route prefix
+
+app.use(errorHandler);
 
 // Middleware to parse JSON request body
 app.use(express.json());
