@@ -16,9 +16,7 @@ export const getBootcamps = async (
       .status(200)
       .json({ success: true, count: bootcamps.length, data: bootcamps });
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({ success: false, error: error.message });
-    }
+    next(error);
   }
 };
 
@@ -42,13 +40,7 @@ export const getBootcamp = async (
     res.status(200).json({ success: true, data: bootcamp });
     console.log(id);
   } catch (error) {
-    if (error instanceof Error)
-      return next(
-        new ErrorResponse(
-          `Failed to retrieve bootcamp.Error:${error.message}`,
-          500
-        )
-      );
+    next(error);
   }
 };
 
@@ -67,7 +59,7 @@ export const createBootcamp = async (
       data: bootcamp,
     });
   } catch (error) {
-    res.status(500).json({ success: false });
+    next(error);
   }
 };
 
@@ -104,11 +96,7 @@ export const updateBootcamp = async (
     // respond with success and updated bootcamp data
     res.status(200).json({ success: true, data: updateBootcamp });
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({ success: false, error: error.message });
-    } else {
-      res.status(500).json({ sucess: false, error: "unknown error " });
-    }
+    next(error);
   }
 };
 
@@ -132,10 +120,6 @@ export const deleteBootcamp = async (
       data: {},
     });
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({ success: false, error: error.message });
-    } else {
-      res.status(500).json({ success: false, error: "unknown error " });
-    }
+    next(error);
   }
 };
