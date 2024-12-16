@@ -30,7 +30,7 @@ export const getBootcamp = async (
 ) => {
   try {
     const { id } = req.params;
-    console.log("Bootcamp Id", id);
+
     const bootcamp = await Bootcamp.findById(id);
 
     if (!bootcamp) {
@@ -89,9 +89,7 @@ export const updateBootcamp = async (
     });
     // handle case where bootcamp is not found
     if (!updateBootcamp) {
-      return res
-        .status(404)
-        .json({ success: false, error: "bootcamp not found " });
+      return next(new ErrorResponse(`Bootcamp not found with id ${id}`, 404));
     }
     // respond with success and updated bootcamp data
     res.status(200).json({ success: true, data: updateBootcamp });
@@ -113,7 +111,7 @@ export const deleteBootcamp = async (
 
     const deleteBootcamp = await Bootcamp.findByIdAndDelete(id);
     if (!deleteBootcamp) {
-      return res.status(400).json("bootcamp not found ");
+      return next(new ErrorResponse(`Bootcamp not found with id ${id}`, 404));
     }
     res.status(200).json({
       success: true,
