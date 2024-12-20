@@ -6,11 +6,14 @@ const router = (0, express_1.Router)();
 // Fetch all bootcamps
 router.get("/", bootcamps_1.getBootcamps);
 // Fetch a single bootcamp by ID
+// @ts-ignore
 router.get("/:id", bootcamps_1.getBootcamp);
 // Create a new bootcamp
 router.post("/", bootcamps_1.createBootcamp);
 // Update a bootcamp by ID
+// @ts-ignore
 router.put("/:id", bootcamps_1.updateBootcamp);
 // Delete a bootcamp by ID
+// @ts-ignore
 router.delete("/:id", bootcamps_1.deleteBootcamp);
 exports.default = router;

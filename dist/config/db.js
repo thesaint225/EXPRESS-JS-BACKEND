@@ -13,13 +13,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
+const colors_1 = __importDefault(require("colors"));
 const connectDB = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield mongoose_1.default.connect(process.env.MONGO_URI);
-        console.log("MongoDB Connected");
+        const connection = yield mongoose_1.default.connect(process.env.MONGO_URI);
+        console.log(colors_1.default.cyan.underline.bold("MongoDB Connected"));
+        console.log(colors_1.default.green(`MongoDB Host: ${connection.connection.host}`));
     }
     catch (error) {
-        console.error(`Error: ${error.message}`);
+        console.error(colors_1.default.red(`Error: ${error.message}`));
         process.exit(1); // Exit with failure
     }
 });

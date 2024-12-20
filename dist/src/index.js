@@ -41,6 +41,8 @@ const bootcampRoutes_1 = __importDefault(require("./routes/bootcampRoutes"));
 const dotenv = __importStar(require("dotenv"));
 const morgan_1 = __importDefault(require("morgan"));
 const db_1 = __importDefault(require("../config/db"));
+const colors_1 = __importDefault(require("colors"));
+const error_1 = __importDefault(require("./middleware/error"));
 // Load the custom config file (config.env)
 const result = dotenv.config({ path: "./config/config.env" });
 if (result.error) {
@@ -51,15 +53,18 @@ console.log("Mongo URI", process.env.MONGO_URI);
 (0, db_1.default)();
 // Create an instance of an Express application
 const app = (0, express_1.default)();
+// Body parser
+app.use(express_1.default.json());
 // Dev logging middleware
 if (process.env.NODE_ENV === "development") {
     app.use((0, morgan_1.default)("dev"));
 }
-// Use the imported routes
+// Mount router
 app.use("/api/v1/bootcamps", bootcampRoutes_1.default); // <-- Fix route prefix
+app.use(error_1.default);
 // Middleware to parse JSON request body
 app.use(express_1.default.json());
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(colors_1.default.yellow.bold(`Server is running on http://localhost:${PORT}`));
 });

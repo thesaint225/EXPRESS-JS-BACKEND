@@ -7,7 +7,7 @@ import color from "colors";
 import errorHandler from "./middleware/error";
 
 // Load the custom config file (config.env)
-const result = dotenv.config({ path: "./config/config.env" });
+const result = dotenv.config();
 if (result.error) {
   console.log("Error loading .env file", result.error);
 }
