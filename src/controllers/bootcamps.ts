@@ -8,10 +8,87 @@ import ErrorResponse from "../utils/errorResponse";
 // @access public
 export const getBootcamps = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const bootcamps = await Bootcamp.find();
-    res
-      .status(200)
-      .json({ success: true, count: bootcamps.length, data: bootcamps });
+    let query;
+
+    // Copy req.query to avoid mutation
+    const reqQuery = { ...req.query };
+
+    // Fields to exclude
+    const removeFields = ["select", "sort", "page", "limit"];
+
+    // Loop over removeFields and delete them from reqQuery
+    removeFields.forEach((param) => delete reqQuery[param]);
+
+    // Create query string
+    let queryStr = JSON.stringify(reqQuery);
+
+    // MongoDB operators (e.g., gt, gte, lt, lte, in)
+    queryStr = queryStr.replace(
+      /\b(gt|gte|lt|lte|in)\b/g, // Replace with MongoDB operators
+      (match) => `$${match}`
+    );
+
+    // Finding resources in the database
+    query = Bootcamp.find(JSON.parse(queryStr));
+
+    // Select specific fields if "select" query parameter is provided
+    if (typeof req.query.select === "string") {
+      const fields = req.query.select.split(",").join(" ");
+      query = query.select(fields);
+    }
+
+    // Sorting the results if "sort" query parameter is provided
+    if (typeof req.query.sort === "string") {
+      const sortBy = req.query.sort.split(",").join(" ");
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort("-timeStamp"); // Default sort by timestamp if not specified
+    }
+
+    // Initialize pagination object
+    const pagination: {
+      next?: { page: number; limit: number };
+      prev?: { page: number; limit: number };
+    } = {};
+
+    // Pagination logic: default page is 1, and limit is 1 if not provided
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const limit = parseInt(req.query.limit as string, 10) || 25;
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    // Get total count of documents
+    const total = await Bootcamp.countDocuments();
+
+    // Apply pagination to the query
+    query = query.skip(startIndex).limit(limit);
+
+    // Set the next page if there are more results
+    if (endIndex < total) {
+      pagination.next = {
+        page: page + 1,
+        limit: limit,
+      };
+    }
+
+    // Set the previous page if it's not the first page
+    if (startIndex > 0) {
+      pagination.prev = {
+        page: page - 1,
+        limit: limit,
+      };
+    }
+
+    // Execute the query and get the bootcamps
+    const bootcamps = await query;
+
+    // Return the response with data and pagination
+    res.status(200).json({
+      success: true,
+      count: bootcamps.length,
+      pagination, // Includes next and prev pagination info if applicable
+      data: bootcamps,
+    });
   }
 );
 

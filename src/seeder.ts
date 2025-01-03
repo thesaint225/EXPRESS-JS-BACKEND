@@ -17,6 +17,7 @@ console.log(process.env.MONGO_URI);
 
 // Load models
 import Bootcamp from "./models/Bootcamp";
+import Course from "./models/Courses";
 import path from "path";
 
 // connect to DB
@@ -38,15 +39,19 @@ mongoose
 
 const bootcampsFilePath = path.join(__dirname, "_data", "bootcamps.json");
 console.log("Resolved path to bootcamps.json:", bootcampsFilePath);
+const coursesFilePath = path.join(__dirname, "_data", "courses.json");
+console.log("Resolved path to bootcamps.json:", coursesFilePath);
 
 // Read JSON file
 const bootcamps = JSON.parse(fs.readFileSync(bootcampsFilePath, "utf-8"));
+const courses = JSON.parse(fs.readFileSync(coursesFilePath, "utf-8"));
 
 // import into Data base
 
 const importData = async () => {
   try {
     await Bootcamp.create(bootcamps);
+    await Course.create(courses);
     console.log("Data Imported...");
     process.exit();
   } catch (error) {
@@ -59,6 +64,7 @@ const importData = async () => {
 const deleteData = async () => {
   try {
     await Bootcamp.deleteMany();
+    await Course.deleteMany();
     console.log("Data destroyed...");
     process.exit();
   } catch (error) {

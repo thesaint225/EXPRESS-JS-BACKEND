@@ -8,7 +8,14 @@ import {
   deleteBootcamp,
 } from "../controllers/bootcamps";
 
+// Include other ressources routers
+
+import courseRouter from "./courseRouter";
+
 const router: Router = Router();
+
+// Re-Route into other ressources routes
+router.use("/:bootcampId/courses", courseRouter);
 
 // Fetch all bootcamps
 router.get("/", getBootcamps);
