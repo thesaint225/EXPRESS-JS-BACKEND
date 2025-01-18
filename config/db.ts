@@ -4,6 +4,7 @@ import color from "colors";
 const connectDB = async (): Promise<void> => {
   try {
     const connection = await mongoose.connect(process.env.MONGO_URI as string);
+    // mongoose.set("strictPopulate", false);
     console.log(color.cyan.underline.bold("MongoDB Connected"));
     console.log(color.green(`MongoDB Host: ${connection.connection.host}`));
   } catch (error) {

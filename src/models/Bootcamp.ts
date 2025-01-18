@@ -1,7 +1,8 @@
 import mongoose, { Schema, Document, Model, model } from "mongoose";
 import slugify from "slugify";
+import Course from "./Courses";
 
-type Bootcamp = {
+type BootcampType = {
   name: string;
   slug: string;
   description: string;
@@ -37,12 +38,14 @@ type Bootcamp = {
   jobAssistance?: boolean;
   jobGuarantee?: boolean;
   acceptGi?: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
+  courses: mongoose.Types.ObjectId[]; // Add this field
 };
+// type BootcampWithCourses = BootcampType & {
+//   courses: mongoose.Types.ObjectId[] | Course[];
+// };
 
 // Define the interface for Bootcamp
-const bootcampSchema = new Schema<Bootcamp>(
+const bootcampSchema = new Schema<BootcampType>(
   {
     name: {
       type: String,
@@ -147,17 +150,25 @@ const bootcampSchema = new Schema<Bootcamp>(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
-// create bootcamp slug from the name
-bootcampSchema.pre("save", function (next) {
-  this.slug = slugify(this.name, {
-    lower: true,
-  });
-  next();
+// Reverse populate with virtuals
+bootcampSchema.virtual("courses", {
+  ref: "Course",
+  localField: "_id",
+  foreignField: "bootcamp",
 });
 
-const Bootcamp = model<Bootcamp>("Bootcamp", bootcampSchema);
+// create bootcamp slug from the name
+// bootcampSchema.pre("save", function (next) {
+//   const bootcamp = this as mongoose.Document & BootcampType;
+//   bootcamp.slug = slugify(bootcamp.name, { lower: true });
+//   next();
+// });
+
+const Bootcamp = model<BootcampType>("Bootcamp", bootcampSchema);
 
 export default Bootcamp;

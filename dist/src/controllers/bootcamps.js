@@ -20,10 +20,68 @@ const errorResponse_1 = __importDefault(require("../utils/errorResponse"));
 // @route GET /api/v1/bootcamps
 // @access public
 exports.getBootcamps = (0, async_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const bootcamps = yield Bootcamp_1.default.find();
-    res
-        .status(200)
-        .json({ success: true, count: bootcamps.length, data: bootcamps });
+    let query;
+    // Copy req.query to avoid mutation
+    const reqQuery = Object.assign({}, req.query);
+    // Fields to exclude
+    const removeFields = ["select", "sort", "page", "limit"];
+    // Loop over removeFields and delete them from reqQuery
+    removeFields.forEach((param) => delete reqQuery[param]);
+    // Create query string
+    let queryStr = JSON.stringify(reqQuery);
+    // MongoDB operators (e.g., gt, gte, lt, lte, in)
+    queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, // Replace with MongoDB operators
+    (match) => `$${match}`);
+    // Finding resources in the database
+    query = Bootcamp_1.default.find(JSON.parse(queryStr)).populate("courses");
+    console.log(query);
+    // Select specific fields if "select" query parameter is provided
+    if (typeof req.query.select === "string") {
+        const fields = req.query.select.split(",").join(" ");
+        query = query.select(fields);
+    }
+    // Sorting the results if "sort" query parameter is provided
+    if (typeof req.query.sort === "string") {
+        const sortBy = req.query.sort.split(",").join(" ");
+        query = query.sort(sortBy);
+    }
+    else {
+        query = query.sort("-timeStamp"); // Default sort by timestamp if not specified
+    }
+    // Initialize pagination object
+    const pagination = {};
+    // Pagination logic: default page is 1, and limit is 1 if not provided
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 25;
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    // Get total count of documents
+    const total = yield Bootcamp_1.default.countDocuments();
+    // Apply pagination to the query
+    query = query.skip(startIndex).limit(limit);
+    // Set the next page if there are more results
+    if (endIndex < total) {
+        pagination.next = {
+            page: page + 1,
+            limit: limit,
+        };
+    }
+    // Set the previous page if it's not the first page
+    if (startIndex > 0) {
+        pagination.prev = {
+            page: page - 1,
+            limit: limit,
+        };
+    }
+    // Execute the query and get the bootcamps
+    const bootcamps = yield query;
+    // Return the response with data and pagination
+    res.status(200).json({
+        success: true,
+        count: bootcamps.length,
+        pagination, // Includes next and prev pagination info if applicable
+        data: bootcamps,
+    });
 }));
 // @description Get a single bootcamp by ID
 // @route GET /api/v1/bootcamps/:id

@@ -6,6 +6,7 @@ import morgan from "morgan";
 import connectDB from "../config/db";
 import color from "colors";
 import errorHandler from "./middleware/error";
+import Bootcamp from "./models/Bootcamp";
 
 // Load the custom config file (config.env)
 const result = dotenv.config();
@@ -39,6 +40,14 @@ app.use(errorHandler);
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
+
+app.get("/", async (req, res) => {
+  const bootcamps = await Bootcamp.find().populate("courses");
+
+  res.json({
+    bootcamps,
+  });
+});
 
 app.listen(PORT, () => {
   console.log(

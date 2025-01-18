@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, response } from "express";
+import { Request, Response, NextFunction } from "express";
 import Bootcamp from "../models/Bootcamp";
 import asyncHandler from "../middleware/async";
 import ErrorResponse from "../utils/errorResponse";
@@ -30,6 +30,7 @@ export const getBootcamps = asyncHandler(
 
     // Finding resources in the database
     query = Bootcamp.find(JSON.parse(queryStr));
+    // console.log(query);
 
     // Select specific fields if "select" query parameter is provided
     if (typeof req.query.select === "string") {
@@ -61,7 +62,11 @@ export const getBootcamps = asyncHandler(
     const total = await Bootcamp.countDocuments();
 
     // Apply pagination to the query
-    query = query.skip(startIndex).limit(limit);
+    query = query.skip(startIndex).limit(limit).populate({
+      path: "courses",
+      select: "title",
+    });
+    // .populate("courses");
 
     // Set the next page if there are more results
     if (endIndex < total) {

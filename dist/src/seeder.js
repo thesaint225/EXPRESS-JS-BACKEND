@@ -48,16 +48,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs = __importStar(require("fs"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const dotenv_1 = require("dotenv");
+(0, dotenv_1.config)();
 console.log("Before dotenv config");
 // Log the current directory to check where the script is being run
 console.log("Current directory:", __dirname);
 console.log("Before dotenv config");
 // load env vars
-(0, dotenv_1.config)({ path: "./config/config.env" });
 console.log("after dotenv config");
 console.log(process.env.MONGO_URI);
 // Load models
 const Bootcamp_1 = __importDefault(require("./models/Bootcamp"));
+const Courses_1 = __importDefault(require("./models/Courses"));
 const path_1 = __importDefault(require("path"));
 // connect to DB
 if (!process.env.MONGO_URI) {
@@ -66,22 +67,26 @@ if (!process.env.MONGO_URI) {
 mongoose_1.default
     .connect(process.env.MONGO_URI)
     .then(() => {
-    console.log("MongoDB connected successfully".green.bold);
+    console.log("MongoDB connected successfully");
 })
     .catch((err) => {
-    console.error(`Error connecting to MongoDB: ${err.message}`.red.bold);
+    console.error(`Error connecting to MongoDB: ${err.message}`);
     process.exit(1); // Exit process with failure
 });
 //   Read JSON files
-const bootcampsFilePath = path_1.default.join(__dirname, "src", "_data", "bootcamps.json");
+const bootcampsFilePath = path_1.default.join(__dirname, "_data", "bootcamps.json");
 console.log("Resolved path to bootcamps.json:", bootcampsFilePath);
+const coursesFilePath = path_1.default.join(__dirname, "_data", "courses.json");
+console.log("Resolved path to bootcamps.json:", coursesFilePath);
 // Read JSON file
 const bootcamps = JSON.parse(fs.readFileSync(bootcampsFilePath, "utf-8"));
+const courses = JSON.parse(fs.readFileSync(coursesFilePath, "utf-8"));
 // import into Data base
 const importData = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield Bootcamp_1.default.create(bootcamps);
-        console.log("Data Imported...".green.inverse);
+        yield Courses_1.default.create(courses);
+        console.log("Data Imported...");
         process.exit();
     }
     catch (error) {
@@ -92,7 +97,8 @@ const importData = () => __awaiter(void 0, void 0, void 0, function* () {
 const deleteData = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield Bootcamp_1.default.deleteMany();
-        console.log("Data destroyed...".red.inverse);
+        yield Courses_1.default.deleteMany();
+        console.log("Data destroyed...");
         process.exit();
     }
     catch (error) {

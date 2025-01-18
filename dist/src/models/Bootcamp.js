@@ -109,13 +109,21 @@ const bootcampSchema = new mongoose_1.Schema({
     },
 }, {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
 });
 // create bootcamp slug from the name
 bootcampSchema.pre("save", function (next) {
-    this.slug = (0, slugify_1.default)(this.name, {
-        lower: true,
-    });
+    const bootcamp = this;
+    bootcamp.slug = (0, slugify_1.default)(bootcamp.name, { lower: true });
     next();
+});
+// Reverse populate with virtuals
+bootcampSchema.virtual("courses", {
+    ref: "Course",
+    localField: "_id",
+    foreignField: "bootcamp",
+    justOne: false,
 });
 const Bootcamp = (0, mongoose_1.model)("Bootcamp", bootcampSchema);
 exports.default = Bootcamp;

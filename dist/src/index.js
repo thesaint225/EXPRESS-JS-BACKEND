@@ -38,13 +38,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const bootcampRoutes_1 = __importDefault(require("./routes/bootcampRoutes"));
+const courseRouter_1 = __importDefault(require("./routes/courseRouter"));
 const dotenv = __importStar(require("dotenv"));
 const morgan_1 = __importDefault(require("morgan"));
 const db_1 = __importDefault(require("../config/db"));
 const colors_1 = __importDefault(require("colors"));
 const error_1 = __importDefault(require("./middleware/error"));
 // Load the custom config file (config.env)
-const result = dotenv.config({ path: "./config/config.env" });
+const result = dotenv.config();
 if (result.error) {
     console.log("Error loading .env file", result.error);
 }
@@ -61,6 +62,7 @@ if (process.env.NODE_ENV === "development") {
 }
 // Mount router
 app.use("/api/v1/bootcamps", bootcampRoutes_1.default); // <-- Fix route prefix
+app.use("/api/v1/courses", courseRouter_1.default); // <-- Fix route prefix
 app.use(error_1.default);
 // Middleware to parse JSON request body
 app.use(express_1.default.json());
