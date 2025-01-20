@@ -174,3 +174,22 @@ export const deleteBootcamp = asyncHandler(
     });
   }
 );
+
+// @description       Upload photo for bootcamp
+// @route             PUT/api/v1/bootcamps/:id/photo
+// @access            private
+export const bootcampPhotoUpload = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+
+    const bootcamp = await Bootcamp.findById(id);
+    if (!bootcamp) {
+      return next(new ErrorResponse(`Bootcamp not found with id ${id}`, 404));
+    }
+    if (!req.files) {
+      return next(new ErrorResponse(`please upload a file `, 400));
+    }
+
+    console.log(req.files);
+  }
+);

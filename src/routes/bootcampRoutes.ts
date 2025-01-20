@@ -6,6 +6,7 @@ import {
   createBootcamp,
   updateBootcamp,
   deleteBootcamp,
+  bootcampPhotoUpload,
 } from "../controllers/bootcamps";
 
 // Include other ressources routers
@@ -16,6 +17,8 @@ const router: Router = Router();
 
 // Re-Route into other ressources routes
 router.use("/:bootcampId/courses", courseRouter);
+
+router.route("/:id/photo").put(bootcampPhotoUpload);
 
 // Fetch all bootcamps
 router.get("/", getBootcamps);
@@ -28,11 +31,9 @@ router.get("/:id", getBootcamp);
 router.post("/", createBootcamp);
 
 // Update a bootcamp by ID
-// @ts-ignore
 router.put("/:id", updateBootcamp);
 
 // Delete a bootcamp by ID
-// @ts-ignore
 router.delete("/:id", deleteBootcamp);
 
 export default router;

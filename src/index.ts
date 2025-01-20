@@ -1,6 +1,7 @@
 import express, { Express } from "express";
 import bootcampRoutes from "./routes/bootcampRoutes";
 import coursesRoutes from "./routes/courseRouter";
+import fileupload from "express-fileupload";
 import * as dotenv from "dotenv";
 import morgan from "morgan";
 import connectDB from "../config/db";
@@ -30,6 +31,9 @@ app.use(express.json());
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+
+// File upload
+app.use(fileupload());
 // Mount router
 app.use("/api/v1/bootcamps", bootcampRoutes); // <-- Fix route prefix
 app.use("/api/v1/courses", coursesRoutes); // <-- Fix route prefix

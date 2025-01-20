@@ -59,7 +59,6 @@ interface CourseModel extends Model<CourseType> {
 
 // statics method to get average of course tuition
 CourseSchema.statics.getAverageCost = async function (bootcampId) {
-  console.log("calculating avg cost...".blue);
   const obj = await this.aggregate([
     {
       $match: { bootcamp: bootcampId },
