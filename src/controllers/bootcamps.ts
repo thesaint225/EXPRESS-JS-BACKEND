@@ -29,7 +29,7 @@ export const getBootcamps = asyncHandler(
     );
 
     // Finding resources in the database
-    query = Bootcamp.find(JSON.parse(queryStr));
+    query = Bootcamp.find(JSON.parse(queryStr)).populate("courses");
     // console.log(query);
 
     // Select specific fields if "select" query parameter is provided

@@ -1,6 +1,19 @@
-import mongoose, { Schema, Document, Model, model } from "mongoose";
+import mongoose, {
+  Schema,
+  Document,
+  Model,
+  model,
+  CallbackWithoutResultAndOptionalError,
+  CallbackError,
+} from "mongoose";
 import slugify from "slugify";
 import Course from "./Courses";
+
+// Define Bootcamp Document Type
+
+interface BootcampDocument extends Document {
+  _id: mongoose.Types.ObjectId;
+}
 
 type BootcampType = {
   name: string;
@@ -168,6 +181,30 @@ bootcampSchema.virtual("courses", {
 //   bootcamp.slug = slugify(bootcamp.name, { lower: true });
 //   next();
 // });
+
+// Middleware: Cascade delete courses when a bootcamp is deleted
+bootcampSchema.pre(
+  "deleteOne",
+  { document: true, query: true }, // Ensure both `document` and `query` are explicitly set
+  async function (next: CallbackWithoutResultAndOptionalError) {
+    // ✅ Correct type for `next`
+    try {
+      const bootcamp = this as BootcampDocument;
+      await Course.deleteMany({ bootcamp: bootcamp._id });
+      next();
+    } catch (error) {
+      next(error as CallbackError);
+    }
+  }
+);
+
+// Reverse populate with virtuals
+bootcampSchema.virtual("course", {
+  ref: "Course",
+  localField: "_id",
+  foreignField: "bootcamp",
+  justOne: false,
+});
 
 const Bootcamp = model<BootcampType>("Bootcamp", bootcampSchema);
 
