@@ -164,10 +164,14 @@ export const deleteBootcamp = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
-    const deleteBootcamp = await Bootcamp.findByIdAndDelete(id);
+    const deleteBootcamp = await Bootcamp.findById(id);
     if (!deleteBootcamp) {
       return next(new ErrorResponse(`Bootcamp not found with id ${id}`, 404));
+    } else {
+      await deleteBootcamp.deleteOne();
+      console.log("Bootcamp and related courses deleted");
     }
+
     res.status(200).json({
       success: true,
       data: {},

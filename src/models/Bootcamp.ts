@@ -190,6 +190,7 @@ bootcampSchema.pre(
     // ✅ Correct type for `next`
     try {
       const bootcamp = this as BootcampDocument;
+      console.log("Courses being removed from bootcamp ");
       await Course.deleteMany({ bootcamp: bootcamp._id });
       next();
     } catch (error) {
