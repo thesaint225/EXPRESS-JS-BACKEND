@@ -187,11 +187,21 @@ bootcampSchema.pre(
   "deleteOne",
   { document: true, query: true }, // Ensure both `document` and `query` are explicitly set
   async function (next: CallbackWithoutResultAndOptionalError) {
-    // ✅ Correct type for `next`
     try {
-      const bootcamp = this as BootcampDocument;
-      console.log("Courses being removed from bootcamp ");
-      await Course.deleteMany({ bootcamp: bootcamp._id });
+      if (this instanceof mongoose.Model) {
+        // This case handles when `this` is a document
+        const bootcamp = this as BootcampDocument;
+        console.log(`Courses being removed from bootcamp ${bootcamp._id}`);
+        await Course.deleteMany({ bootcamp: bootcamp._id });
+      } else if (this instanceof mongoose.Query) {
+        // This case handles when `this` is a query
+        const queryFilter = this.getFilter() as {
+          _id: mongoose.Types.ObjectId;
+        };
+        console.log(`Courses being removed from bootcamp ${queryFilter._id}`);
+        await Course.deleteMany({ bootcamp: queryFilter._id });
+      }
+
       next();
     } catch (error) {
       next(error as CallbackError);
